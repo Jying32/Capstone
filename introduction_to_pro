@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to Python</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5faff;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .lesson-route {
+            flex: 1;
+            background: linear-gradient(135deg, #72bcd4, #b3e5fc);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+        }
+
+        .lesson-route h2 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson {
+            background: white;
+            color: #333;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            width: 80%;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .lesson:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel {
+            flex: 1;
+            background: white;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .panel h2 {
+            margin-bottom: 1rem;
+            color: #72bcd4;
+        }
+
+        .panel ul {
+            margin: 1rem 0;
+            padding-left: 20px;
+            color: #555;
+        }
+
+        .panel ul li {
+            margin-bottom: 0.5rem;
+        }
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: #ddd;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background: #72bcd4;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="lesson-route">
+        <h2>Lesson Progress</h2>
+        <div class="lesson" onclick="loadLesson(1)">Lesson 1: What is Python?</div>
+        <div class="lesson" onclick="loadLesson(2)">Lesson 2: Installing Python and Jupyter Notebook</div>
+        <div class="lesson" onclick="loadLesson(3)">Lesson 3: Variables and Data Types</div>
+        <div class="lesson" onclick="loadLesson(4)">Lesson 4: Operators</div>
+        <div class="lesson" onclick="loadLesson(5)">Lesson 5: Control Structures</div>
+        <div class="lesson" onclick="loadLesson(6)">Lesson 6: Functions</div>
+        <div class="lesson" onclick="loadLesson(7)">Lesson 7: Data Structures</div>
+        <div class="lesson" onclick="loadLesson(8)">Lesson 8: Modules and Packages</div>
+        <div class="lesson" onclick="loadLesson(9)">Lesson 9: File Handling</div>
+        <div class="lesson" onclick="loadLesson(10)">Lesson 10: Error Handling</div>
+    </div>
+
+    <div class="panel" id="lesson-panel">
+        <h2>Lesson Outline</h2>
+        <p id="lesson-description">Click on a lesson to view its details.</p>
+        <h3 id="topics-header" style="display: none;">Topics Covered:</h3>
+        <ul id="lesson-topics"></ul>
+        <div id="lesson-content"></div>
+    </div>
+
+    <script>
+        const lessons = {
+            1: {
+                description: "Python is a high-level, interpreted programming language known for its simplicity and readability.",
+                topics: [
+                    "Origins of Python",
+                    "What is Python?",
+                    "Key Features of Python"
+                ],
+                content: {
+                    "Origins of Python": `<p>Python was created by Guido van Rossum in 1989 as a way to simplify programming. He wanted a language that was easy to read and use, drawing inspiration from the ABC language. It was officially released in 1991 and has since evolved into one of the world's most popular programming languages.</p>
+                    <ul>
+                        <li><strong>Who & When:</strong> Python was created by Guido van Rossum and released in February 1991.</li>
+                        <li><strong>Why it was developed:</strong> Guido developed Python to make programming simpler and more intuitive. He took inspiration from the ABC language and improved upon its limitations.</li>
+                        <li><strong>How it evolved:</strong> Python evolved with the help of a growing open-source community, leading to the release of Python 2.0 in 2000 and Python 3.0 in 2008.</li>
+                    </ul>`,
+                    "What is Python?": `<p>Python is a high-level programming language known for its simplicity and readability. It is an interpreted language, meaning code can be executed directly without compilation. Python’s versatility makes it widely used in web development, data science, AI, and more.</p>
+                    <p>Python uses indentation rather than brackets, making its code more readable. Because of this, it is often recommended for beginners. Python has a large supportive community and a vast library ecosystem, making it a go-to choice for developers worldwide.</p>
+                    <h3>Examples of where Python is used:</h3>
+                    <ul>
+                        <li><strong>Web Development:</strong> Frameworks like Django and Flask help build websites.</li>
+                        <li><strong>Data Science:</strong> Libraries like pandas and NumPy enable data analysis.</li>
+                        <li><strong>Machine Learning & AI:</strong> TensorFlow and PyTorch make AI development accessible.</li>
+                        <li><strong>Automation:</strong> Python scripts automate tasks like web scraping and data processing.</li>
+                    </ul>`,
+                    "Key Features of Python": `<ul>
+                        <li><strong>Easy-to-learn syntax:</strong> Python’s syntax is clean and readable, making it beginner-friendly.</li>
+                        <li><strong>Interpreted language:</strong> Python runs code without needing compilation, making development faster.</li>
+                        <li><strong>Dynamically typed:</strong> Variables do not need explicit type declarations.</li>
+                        <li><strong>Extensive libraries and frameworks:</strong> Python offers numerous libraries, such as NumPy, Django, and TensorFlow.</li>
+                        <li><strong>Versatile applications:</strong> Python is used across various fields, including AI, web development, and data science.</li>
+                    </ul>`
+                }
+            },
+
+            2: {
+                description: "Learn how to install Python and Jupyter Notebook to start coding.",
+                topics: [
+                    "Downloading Python",
+                    "Installing Python and Pip",
+                    "Setting Up Jupyter Notebook"
+                ],
+                content: {
+                    "Installing Python": `<ul>
+                        <li>Download Python from <a href='https://www.python.org/' target='_blank'>python.org</a></li>
+                        <li>Install Python and ensure pip (Python package manager) is installed.</li>
+                        <li>Verify installation using the command:</li>
+                        <pre><code>python --version</code></pre>
+                    </ul>`,
+                    "Installing Jupyter Notebook": `<p>Jupyter Notebook is an interactive Python environment useful for writing and running code.</p>
+                    <ul>
+                        <li>Install Jupyter Notebook using pip:</li>
+                        <pre><code>pip install jupyter</code></pre>
+                        <li>Run Jupyter Notebook:</li>
+                        <pre><code>jupyter notebook</code></pre>
+                    </ul>`
+                }
+            },
+            3: {
+                
+                description: "Understanding variables and data types in Python.",
+                topics: [
+                    "What are Variables?",
+                    "Rules for Naming Variables",
+                    "Data Types in Python",
+                    "Type Conversion",
+                    "Getting User Input",
+                    "Checking Data Types"
+                ],
+                content: {
+                    "What are Variables?": `<p>A variable in Python is a named container used to store data. It acts as a placeholder for values.</p>
+                    <pre><code>x = 10  # Integer
+name = "Python"  # String
+pi = 3.14  # Float
+is_valid = True  # Boolean</code></pre>`,
+                    "Rules for Naming Variables": `<ul>
+                        <li>Must start with a letter (a-z, A-Z) or an underscore (_)</li>
+                        <li>Cannot start with a number</li>
+                        <li>Can contain letters, numbers, and underscores (_), but no spaces</li>
+                        <li>Case-sensitive (e.g., name and Name are different)</li>
+                    </ul>`,
+                    "Data Types in Python": `<ul>
+                        <li><strong>Integer (int)</strong>: Whole numbers (<code>age = 25</code>)</li>
+                        <li><strong>Float (float)</strong>: Decimal numbers (<code>pi = 3.14159</code>)</li>
+                        <li><strong>String (str)</strong>: Sequence of characters (<code>message = "Hello, Python!"</code>)</li>
+                        <li><strong>Boolean (bool)</strong>: True or False values (<code>is_active = True</code>)</li>
+                        <li><strong>List (list)</strong>: Ordered, mutable collection (<code>fruits = ["apple", "banana"]</code>)</li>
+                        <li><strong>Tuple (tuple)</strong>: Immutable collection (<code>coordinates = (10, 20)</code>)</li>
+                        <li><strong>Dictionary (dict)</strong>: Key-value pairs (<code>student = {"name": "Alice", "age": 20}</code>)</li>
+                        <li><strong>Set (set)</strong>: Unordered unique collection (<code>unique_numbers = {1, 2, 3, 4}</code>)</li>
+                    </ul>`,
+                    "Type Conversion": `<p>Convert between data types using built-in functions.</p>
+                    <pre><code>x = 5
+y = float(x)  # Convert to float (5.0)
+z = str(x)  # Convert to string ("5")</code></pre>`,
+                    "Getting User Input": `<p>Use the <code>input()</code> function to take user input.</p>
+                    <pre><code>name = input("Enter your name: ")
+print("Hello, " + name + "!")</code></pre>`,
+                    "Checking Data Types": `<p>Use <code>type()</code> to check a variable's data type.</p>
+                    <pre><code>print(type(10))  # Output: <class 'int'>
+print(type("Hello"))  # Output: <class 'str'></code></pre>`
+                }
+            },
+            4: {
+                description: "Learn about operators and expressions in Python.",
+                topics: [
+                    "Arithmetic Operators",
+                    "Comparison Operators",
+                    "Logical Operators",
+                    "Assignment Operators"
+                ]
+            },
+            5: {
+                description: "Understand control structures like conditionals and loops.",
+                topics: [
+                    "Conditional Statements",
+                    "Loops",
+                    "Break and Continue"
+                ]
+            },
+            6: {
+                description: "Introduction to functions and their usage in Python.",
+                topics: [
+                    "Defining Functions",
+                    "Function Arguments and Return Values",
+                    "Scope and Lifetime of Variables"
+                ]
+            },
+            7: {
+                description: "Learn about Python's built-in data structures.",
+                topics: [
+                    "Lists",
+                    "Tuples",
+                    "Dictionaries",
+                    "Sets"
+                ]
+            },
+            8: {
+                description: "Explore Python modules and packages.",
+                topics: [
+                    "Importing Modules",
+                    "Standard Library Overview",
+                    "Installing External Packages"
+                ]
+            },
+            9: {
+                description: "Learn how to handle file input and output in Python.",
+                topics: [
+                    "Reading from Files",
+                    "Writing to Files"
+                ]
+            },
+            10: {
+                description: "Understand error handling and exceptions in Python.",
+                topics: [
+                    "Understanding Exceptions",
+                    "Try-Except Blocks",
+                    "Raising Exceptions"
+                ]
+            }
+        };
+        function updateProgressBar() {
+            const panel = document.getElementById("lesson-panel");
+            const progressBar = document.getElementById("progress-bar");
+            const scrollTop = panel.scrollTop;
+            const scrollHeight = panel.scrollHeight - panel.clientHeight;
+            const scrollPercentage = (scrollTop / scrollHeight) * 100;
+            progressBar.style.width = scrollPercentage + "%";
+        }
+
+        let pyodideReady = false;
+        let pyodide;
+
+        async function loadPyodideAndPackages() {
+            pyodide = await loadPyodide();
+            pyodideReady = true;
+        }
+
+        loadPyodideAndPackages();
+
+        function createGrokStyleBlock(code, idSuffix = "") {
+    const container = document.createElement("div");
+    container.style.backgroundColor = "#eef6fd";
+    container.style.padding = "1rem";
+    container.style.borderRadius = "10px";
+    container.style.fontFamily = "monospace";
+    container.style.marginTop = "1rem";
+
+    // Textarea
+    const textarea = document.createElement("textarea");
+    textarea.id = `grok-editor${idSuffix}`;
+    textarea.value = code;
+    textarea.style.width = "100%";
+    textarea.style.height = "120px";
+    textarea.style.background = "#eef6fd";
+    textarea.style.border = "1px solid #ccc";
+    textarea.style.fontFamily = "monospace";
+    textarea.style.fontSize = "1rem";
+    textarea.style.color = "#333";
+    textarea.style.resize = "vertical";
+
+    // Run Button
+    const button = document.createElement("button");
+    button.innerText = "Run Code";
+    button.style.marginTop = "10px";
+    button.style.backgroundColor = "#72bcd4";
+    button.style.color = "white";
+    button.style.padding = "8px 12px";
+    button.style.border = "none";
+    button.style.borderRadius = "6px";
+    button.style.cursor = "pointer";
+
+    // Output (Terminal-style)
+    const outputLabel = document.createElement("div");
+    outputLabel.textContent = "Output:";
+    outputLabel.style.marginTop = "1rem";
+    outputLabel.style.fontWeight = "bold";
+    outputLabel.style.color = "#333";
+
+    const outputBox = document.createElement("pre");
+    outputBox.id = `grok-output${idSuffix}`;
+    outputBox.style.background = "#000";
+    outputBox.style.color = "#00FF00";
+    outputBox.style.padding = "10px";
+    outputBox.style.marginTop = "5px";
+    outputBox.style.borderRadius = "6px";
+    outputBox.style.whiteSpace = "pre-wrap";
+    outputBox.style.minHeight = "80px";
+
+    button.onclick = async () => {
+        const code = textarea.value;
+        if (!pyodideReady) {
+            outputBox.textContent = "Python is still loading...";
+            return;
+        }
+        try {
+            let output = "";
+            const originalConsole = pyodide._module.print;
+            pyodide.setStdout({
+                batched: (text) => output += text + "\n"
+            });
+            await pyodide.runPythonAsync(code);
+            outputBox.textContent = output || "Code ran successfully.";
+            pyodide.setStdout({ batched: originalConsole }); // Reset
+        } catch (err) {
+            outputBox.textContent = "Error: " + err;
+        }
+    };
+
+    // Assemble block
+    container.appendChild(textarea);
+    container.appendChild(button);
+    container.appendChild(outputLabel);
+    container.appendChild(outputBox);
+
+    return container;
+}
+
+
+
+        function loadLesson(lessonNumber) {
+            const lesson = lessons[lessonNumber];
+            if (lesson) {
+                document.getElementById("lesson-description").innerHTML = lesson.description;
+                document.getElementById("topics-header").style.display = "block";
+                document.getElementById("lesson-topics").innerHTML = lesson.topics.map(topic => `<li>${topic}</li>`).join("");
+
+                const contentContainer = document.getElementById("lesson-content");
+                contentContainer.innerHTML = "";
+
+                if (lesson.content) {
+            for (const [key, value] of Object.entries(lesson.content)) {
+                const topicTitle = document.createElement("h3");
+                topicTitle.textContent = key;
+
+                const topicBody = document.createElement("div");
+                topicBody.innerHTML = value;
+
+                contentContainer.appendChild(topicTitle);
+                contentContainer.appendChild(topicBody);
+
+                // Examples mapped to each topic
+                const examples = {
+                    "What are Variables?": `x = 10\nname = "Python"\npi = 3.14\nis_valid = True\nprint(x, name, pi, is_valid)`,
+                    "Type Conversion": `x = 5\ny = float(x)\nz = str(x)\nprint(y, z)`,
+                    "Getting User Input": `# Simulated input\nname = "Alice"\nprint("Hello, " + name + "!")`,
+                    "Checking Data Types": `print(type(10))\nprint(type("Hello"))`
+                };
+
+                // Choose Grok-style or regular block
+                if (examples[key]) {
+                    const codeBlock = key === "What are Variables?"
+                        ? createGrokStyleBlock(
+                            `question = 'Why did the chicken cross the road?'\nanswer = 'To get to the other side!'\nprint(question)\nprint(answer)`,
+                            "Vars"
+                        )
+                        : createExecutableCodeBlock(examples[key]);
+                    contentContainer.appendChild(codeBlock);
+                }
+
+                if (key === "Data Types in Python") {
+                    const dataTypeExamples = {
+                        "Integer (int)": "age = 25\nprint(age, type(age))",
+                        "Float (float)": "pi = 3.14159\nprint(pi, type(pi))",
+                        "String (str)": "message = \"Hello, Python!\"\nprint(message, type(message))",
+                        "Boolean (bool)": "is_active = True\nprint(is_active, type(is_active))",
+                        "List (list)": "fruits = [\"apple\", \"banana\"]\nprint(fruits, type(fruits))",
+                        "Tuple (tuple)": "coordinates = (10, 20)\nprint(coordinates, type(coordinates))",
+                        "Dictionary (dict)": "student = {\"name\": \"Alice\", \"age\": 20}\nprint(student, type(student))",
+                        "Set (set)": "unique_numbers = {1, 2, 3, 4}\nprint(unique_numbers, type(unique_numbers))"
+                    };
+
+                    let count = 1;
+                    for (const [label, code] of Object.entries(dataTypeExamples)) {
+                        const container = document.createElement("div");
+                        container.innerHTML = `
+                            <h4>${label}</h4>
+                            <div style='background-color:#eef6fd;padding:1rem;border-radius:10px;font-family:monospace;'>
+                                <textarea id='editor${count}' style='width:100%;height:120px;background:#eef6fd;border:1px solid #ccc;font-size:1rem;'>${code}</textarea>
+                                <button onclick='runCode("editor${count}", "output${count}")' style='margin-top:10px;background-color:#72bcd4;color:white;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;'>Run Code</button>
+                                <div style='margin-top:1rem;font-weight:bold;'>Output:</div>
+                                <pre id='output${count}' style='background:black;color:lime;padding:10px;border-radius:6px;min-height:60px;'></pre>
+                            </div>
+                        `;
+                        contentContainer.appendChild(container);
+                        count++;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+        document.getElementById("lesson-panel").addEventListener("scroll", updateProgressBar);
+
+        function updateProgressBar() {
+            const panel = document.getElementById("lesson-panel");
+            const progressBar = document.getElementById("progress-bar");
+            const scrollTop = panel.scrollTop;
+            const scrollHeight = panel.scrollHeight - panel.clientHeight;
+            const scrollPercentage = (scrollTop / scrollHeight) * 100;
+            progressBar.style.width = scrollPercentage + "%";
+        }
+        async function runCode(editorId, outputId) {
+            const code = document.getElementById(editorId).value;
+            const outputBox = document.getElementById(outputId);
+            if (!pyodideReady) {
+                outputBox.textContent = "Python is still loading...";
+                return;
+            }
+            try {
+                let output = "";
+                const originalConsole = pyodide._module.print;
+                pyodide.setStdout({ batched: (text) => output += text + "\\n" });
+                await pyodide.runPythonAsync(code);
+                outputBox.textContent = output || "Code ran successfully.";
+                pyodide.setStdout({ batched: originalConsole });
+            } catch (err) {
+                outputBox.textContent = "Error: " + err;
+            }
+        }
+
+
+        
+    </script>
+</body>
+</html>
